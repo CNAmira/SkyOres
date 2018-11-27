@@ -2,6 +2,8 @@ package io.github.cnamira.SkyOres.Listeners;
 
 import io.github.cnamira.SkyOres.SkyOres;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -21,16 +23,36 @@ public class GenerateOres implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onGenerateCobblestone(BlockFromToEvent event) {
-        if (event.getToBlock().getType() == Material.WATER || event.getToBlock().getType() == Material.LAVA || event.getBlock().getType() == Material.DRAGON_EGG) {
-            return;
-        }
-        for (String world : addon.getConfig().getStringList("worlds")) {
-            if (event.getBlock().getWorld().getName().equals(world)) {
-                event.getToBlock().setType(getRandomMaterial());
-                event.setCancelled(true);
-                return;
+        if ((event.getBlock().getType().equals(Material.WATER) || event.getBlock().getType().equals(Material.LAVA)) && isGeneratingCobblestone(event.getBlock(), event.getToBlock())) {
+            for (String world : addon.getConfig().getStringList("worlds")) {
+                if (event.getBlock().getWorld().getName().equals(world)) {
+                    event.getToBlock().setType(getRandomMaterial());
+                    event.setCancelled(true);
+                    return;
+                }
             }
         }
+    }
+
+    private final BlockFace[] faces = new BlockFace[]{
+            BlockFace.SELF,
+            BlockFace.UP,
+            BlockFace.DOWN,
+            BlockFace.NORTH,
+            BlockFace.EAST,
+            BlockFace.SOUTH,
+            BlockFace.WEST
+    };
+
+    private boolean isGeneratingCobblestone(Block block, Block to) {
+        Material m2 = block.getType().equals(Material.WATER) ? Material.LAVA : Material.WATER;
+        for (BlockFace face : faces) {
+            Block r = to.getRelative(face, 1);
+            if (r.getType().equals(m2)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Material getRandomMaterial() {
