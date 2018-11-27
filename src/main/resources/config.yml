@@ -1,0 +1,19 @@
+# SkyOres Configuration
+
+# Worlds to be activated.
+worlds:
+  - BSkyBlock_world
+  - BSkyBlock_world_nether
+  - BSkyBlock_world_end
+
+# Ores to be generates.
+ores:
+  COBBLESTONE: 200
+  COAL_ORE: 20
+  NETHER_QUARTZ_ORE: 10
+  IRON_ORE: 10
+  GOLD_ORE: 5
+  REDSTONE_ORE: 5
+  LAPIS_ORE: 5
+  DIAMOND_ORE: 2
+  EMERALD_ORE: 1

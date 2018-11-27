@@ -1,0 +1,6 @@
+name: SkyOres
+main: io.github.cnamira.SkyOres.SkyOres
+version: ${version}
+
+authors: Haruchan__
+
