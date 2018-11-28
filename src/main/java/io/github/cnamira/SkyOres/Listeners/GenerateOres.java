@@ -14,6 +14,7 @@ import java.util.*;
 
 public class GenerateOres implements Listener {
     private SkyOres addon;
+    private Random random = new Random();
     private List<Ore> ores;
     private int sum = 0;
 
@@ -69,7 +70,6 @@ public class GenerateOres implements Listener {
             }
         }
 
-        Random random = new Random();
         int rand = random.nextInt(sum + 1);
         for (Ore ore : ores) {
             rand -= ore.getWeight();
