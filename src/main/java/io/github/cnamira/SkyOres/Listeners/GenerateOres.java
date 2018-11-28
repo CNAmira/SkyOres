@@ -14,8 +14,8 @@ import java.util.*;
 
 public class GenerateOres implements Listener {
     private SkyOres addon;
-    private List<Integer> weights;
-    private List<Material> ores;
+    private List<Ore> ores;
+    private int sum = 0;
 
     public GenerateOres(SkyOres addon) {
         this.addon = addon;
@@ -56,25 +56,45 @@ public class GenerateOres implements Listener {
     }
 
     private Material getRandomMaterial() {
-        if (weights == null || ores == null) {
-            weights = new ArrayList<>();
+        if (ores == null) {
             ores = new ArrayList<>();
-            int i = 0;
             ConfigurationSection section = addon.getConfig().getConfigurationSection("ores");
-            for (String key : section.getKeys(false)) {
-                i += section.getInt(key);
-                weights.add(i);
-                ores.add(Material.matchMaterial(key));
+            Set<String> keys = section.getKeys(false);
+            for (String key : keys) {
+                Material material = Material.matchMaterial(key);
+                int weight = section.getInt(key);
+                Ore ore = new Ore(material, weight);
+                sum += weight;
+                ores.add(ore);
             }
         }
+
         Random random = new Random();
-        int rand = random.nextInt(weights.get(weights.size() - 1) + 1);
-        for (int i = weights.size() - 1; i >= 0; i--) {
-            if (weights.get(i) <= rand) {
-                return ores.get(i);
+        int rand = random.nextInt(sum + 1);
+        for (Ore ore : ores) {
+            rand -= ore.getWeight();
+            if (rand <= 0) {
+                return ore.getType();
             }
         }
         return Material.COBBLESTONE;
     }
 
+    private class Ore {
+        private Material type;
+        private int weight;
+
+        Ore(Material type, int weight) {
+            this.type = type;
+            this.weight = weight;
+        }
+
+        int getWeight() {
+            return weight;
+        }
+
+        Material getType() {
+            return type;
+        }
+    }
 }
