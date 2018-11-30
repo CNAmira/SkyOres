@@ -4,7 +4,7 @@
 worlds:
   - BSkyBlock_world
   - BSkyBlock_world_nether
-  - BSkyBlock_world_end
+  - BSkyBlock_world_the_end
 
 # Ores to be generates.
 ores:
