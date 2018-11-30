@@ -2,19 +2,18 @@ package io.github.cnamira.SkyOres.Listeners;
 
 import io.github.cnamira.SkyOres.SkyOres;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockFormEvent;
 
+import java.security.SecureRandom;
 import java.util.*;
 
 public class GenerateOres implements Listener {
     private SkyOres addon;
-    private Random random = new Random();
+    private SecureRandom random = new SecureRandom();
     private List<Ore> ores;
     private int sum = 0;
 
@@ -23,37 +22,10 @@ public class GenerateOres implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
-    public void onGenerateCobblestone(BlockFromToEvent event) {
-        if ((event.getBlock().getType().equals(Material.WATER) || event.getBlock().getType().equals(Material.LAVA)) && isGeneratingCobblestone(event.getBlock(), event.getToBlock())) {
-            for (String world : addon.getConfig().getStringList("worlds")) {
-                if (event.getBlock().getWorld().getName().equals(world)) {
-                    event.getToBlock().setType(getRandomMaterial());
-                    event.setCancelled(true);
-                    return;
-                }
-            }
+    public void onGenerateCobblestone(BlockFormEvent event) {
+        if (event.getNewState().getType().equals(Material.COBBLESTONE) || event.getNewState().getType().equals(Material.STONE)) {
+            event.getNewState().setType(getRandomMaterial());
         }
-    }
-
-    private final BlockFace[] faces = new BlockFace[]{
-            BlockFace.SELF,
-            BlockFace.UP,
-            BlockFace.DOWN,
-            BlockFace.NORTH,
-            BlockFace.EAST,
-            BlockFace.SOUTH,
-            BlockFace.WEST
-    };
-
-    private boolean isGeneratingCobblestone(Block block, Block to) {
-        Material m2 = block.getType().equals(Material.WATER) ? Material.LAVA : Material.WATER;
-        for (BlockFace face : faces) {
-            Block r = to.getRelative(face, 1);
-            if (r.getType().equals(m2)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private Material getRandomMaterial() {
