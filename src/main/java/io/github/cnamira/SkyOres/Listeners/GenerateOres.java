@@ -23,8 +23,14 @@ public class GenerateOres implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onGenerateCobblestone(BlockFormEvent event) {
-        if (event.getNewState().getType().equals(Material.COBBLESTONE) || event.getNewState().getType().equals(Material.STONE)) {
-            event.getNewState().setType(getRandomMaterial());
+        List<String> worlds = addon.getConfig().getStringList("worlds");
+        for (String world : worlds) {
+            if (event.getNewState().getWorld().getName().equals(world)) {
+                if (event.getNewState().getType().equals(Material.COBBLESTONE) || event.getNewState().getType().equals(Material.STONE)) {
+                    event.getNewState().setType(getRandomMaterial());
+                    return;
+                }
+            }
         }
     }
 
