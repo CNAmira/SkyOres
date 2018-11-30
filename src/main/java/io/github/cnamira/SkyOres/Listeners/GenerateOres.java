@@ -14,40 +14,44 @@ import java.util.*;
 public class GenerateOres implements Listener {
     private SkyOres addon;
     private SecureRandom random = new SecureRandom();
-    private List<Ore> ores;
+    private List<Ore> ores = new ArrayList<>();
+    private List<String> worlds = new ArrayList<>();
     private int sum = 0;
 
     public GenerateOres(SkyOres addon) {
         this.addon = addon;
+
+        ConfigurationSection section = addon.getConfig().getConfigurationSection("ores");
+        Set<String> keys = section.getKeys(false);
+        for (String key : keys) {
+            Material material = Material.matchMaterial(key);
+            int weight = section.getInt(key);
+            Ore ore = new Ore(material, weight);
+            sum += weight;
+            ores.add(ore);
+        }
+
+        List<String> worlds = addon.getConfig().getStringList("worlds");
+        for (String world : worlds) {
+            if (addon.getServer().getWorld(world) != null) {
+                this.worlds.add(world);
+            } else {
+                this.addon.getLogger().warning("World name " + world + " does NOT exist, ignoring.");
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onGenerateCobblestone(BlockFormEvent event) {
-        List<String> worlds = addon.getConfig().getStringList("worlds");
-        for (String world : worlds) {
-            if (event.getNewState().getWorld().getName().equals(world)) {
-                if (event.getNewState().getType().equals(Material.COBBLESTONE) || event.getNewState().getType().equals(Material.STONE)) {
-                    event.getNewState().setType(getRandomMaterial());
-                    return;
-                }
+        if (this.worlds.contains(event.getNewState().getWorld().getName())) {
+            if (event.getNewState().getType().equals(Material.COBBLESTONE) || event.getNewState().getType().equals(Material.STONE)) {
+                event.getNewState().setType(getRandomMaterial());
+                return;
             }
         }
     }
 
     private Material getRandomMaterial() {
-        if (ores == null) {
-            ores = new ArrayList<>();
-            ConfigurationSection section = addon.getConfig().getConfigurationSection("ores");
-            Set<String> keys = section.getKeys(false);
-            for (String key : keys) {
-                Material material = Material.matchMaterial(key);
-                int weight = section.getInt(key);
-                Ore ore = new Ore(material, weight);
-                sum += weight;
-                ores.add(ore);
-            }
-        }
-
         int rand = random.nextInt(sum + 1);
         for (Ore ore : ores) {
             rand -= ore.getWeight();
